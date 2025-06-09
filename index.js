@@ -1,5 +1,5 @@
 const fs = require('fs');
-const ytdl = require('ytdl-core');
+const youtubedl = require('youtube-dl-exec');
 const { execFile } = require('child_process');
 const path = require('path');
 
@@ -15,11 +15,9 @@ const OUTPUT_DIR = 'screenshots';
 const TEMP_FILE = 'temp_video.mp4';
 
 async function downloadVideo(videoUrl) {
-  return new Promise((resolve, reject) => {
-    const stream = ytdl(videoUrl, { quality: 'highestvideo' })
-      .pipe(fs.createWriteStream(TEMP_FILE));
-    stream.on('finish', resolve);
-    stream.on('error', reject);
+  await youtubedl(videoUrl, {
+    output: TEMP_FILE,
+    quiet: true,
   });
 }
 
@@ -88,11 +86,14 @@ async function run() {
     console.log(`Video duration: ${duration}s`);
     console.log('Generating screenshots...');
     await makeScreenshots(duration);
-    fs.unlinkSync(TEMP_FILE);
     console.log(`Generated ${count} screenshot(s) in ${OUTPUT_DIR}/`);
   } catch (err) {
     console.error('Error:', err.message);
-    process.exit(1);
+    process.exitCode = 1;
+  } finally {
+    if (fs.existsSync(TEMP_FILE)) {
+      fs.unlinkSync(TEMP_FILE);
+    }
   }
 }
 
