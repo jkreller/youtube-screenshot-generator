@@ -10,7 +10,5 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
-  "dependencies": {
-    "ytdl-core": "^4.11.5"
-  }
+  "dependencies": {}
 }

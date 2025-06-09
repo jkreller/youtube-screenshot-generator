@@ -1,15 +1,13 @@
 # YouTube Screenshot Generator
 
-This project provides a simple Node.js script for generating screenshots from YouTube videos.
+This project provides a simple Node.js script for generating screenshots from video files.
 
 ## Requirements
 
 - Node.js (v18 or later)
 - ffmpeg (includes `ffprobe` and is available on most package managers)
 
-The script downloads the video using `ytdl-core` and captures screenshots with the
-`ffmpeg` command line tools. It no longer relies on the deprecated `fluent-ffmpeg`
-library.
+The script requires `ffmpeg` (with `ffprobe`) to determine the video duration and extract frames. It no longer relies on the deprecated `fluent-ffmpeg` library.
 
 ## Installation
 
@@ -20,7 +18,7 @@ npm install
 ## Usage
 
 ```bash
-node index.js <YouTube URL> <number of screenshots>
+node index.js <video file> <number of screenshots>
 ```
 
 Screenshots will be saved in the `screenshots/` directory. The number of screenshots defaults to `1` if not specified.
@@ -28,7 +26,7 @@ Screenshots will be saved in the `screenshots/` directory. The number of screens
 **Example**
 
 ```bash
-node index.js https://www.youtube.com/watch?v=dQw4w9WgXcQ 3
+node index.js myvideo.mp4 3
 ```
 
 This command generates three screenshots from the video.
