@@ -5,9 +5,11 @@ This project provides a simple Node.js script for generating screenshots from Yo
 ## Requirements
 
 - Node.js (v18 or later)
-- ffmpeg (available on most package managers)
+- ffmpeg (includes `ffprobe` and is available on most package managers)
 
-The script downloads the video using `ytdl-core` and captures screenshots with `ffmpeg`.
+The script downloads the video using `ytdl-core` and captures screenshots with the
+`ffmpeg` command line tools. It no longer relies on the deprecated `fluent-ffmpeg`
+library.
 
 ## Installation
 

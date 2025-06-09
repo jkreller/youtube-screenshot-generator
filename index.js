@@ -1,6 +1,7 @@
 const fs = require('fs');
 const ytdl = require('ytdl-core');
-const ffmpeg = require('fluent-ffmpeg');
+const { execFile } = require('child_process');
+const path = require('path');
 
 const url = process.argv[2];
 const count = parseInt(process.argv[3], 10) || 1;
@@ -24,10 +25,22 @@ async function downloadVideo(videoUrl) {
 
 async function getDuration(file) {
   return new Promise((resolve, reject) => {
-    ffmpeg.ffprobe(file, (err, data) => {
-      if (err) return reject(err);
-      resolve(data.format.duration);
-    });
+    execFile(
+      'ffprobe',
+      [
+        '-v',
+        'error',
+        '-show_entries',
+        'format=duration',
+        '-of',
+        'default=noprint_wrappers=1:nokey=1',
+        file,
+      ],
+      (err, stdout) => {
+        if (err) return reject(err);
+        resolve(parseFloat(stdout));
+      }
+    );
   });
 }
 
@@ -39,16 +52,30 @@ async function makeScreenshots(duration) {
   const tasks = [];
   for (let i = 1; i <= count; i++) {
     const timestamp = (duration * i) / (count + 1);
-    tasks.push(new Promise((resolve, reject) => {
-      ffmpeg(TEMP_FILE)
-        .on('end', resolve)
-        .on('error', reject)
-        .screenshots({
-          timestamps: [timestamp],
-          filename: `screenshot${i}.png`,
-          folder: OUTPUT_DIR,
-        });
-    }));
+    const filename = path.join(OUTPUT_DIR, `screenshot${i}.png`);
+    tasks.push(
+      new Promise((resolve, reject) => {
+        execFile(
+          'ffmpeg',
+          [
+            '-y',
+            '-loglevel',
+            'error',
+            '-ss',
+            String(timestamp),
+            '-i',
+            TEMP_FILE,
+            '-vframes',
+            '1',
+            filename,
+          ],
+          (err) => {
+            if (err) return reject(err);
+            resolve();
+          }
+        );
+      })
+    );
   }
   await Promise.all(tasks);
 }
